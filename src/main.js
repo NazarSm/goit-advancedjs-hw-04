@@ -1,6 +1,8 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import axios from 'axios';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const API_KEY = '42430851-e611567fbd1b8d73c000ca0dd';
 const API_URL = 'https://pixabay.com/api/';
@@ -13,6 +15,8 @@ let itemsCount = 0;
 let fetchedItemCount = 0;
 let page = 1;
 let searchValue = '';
+
+const lightbox = new SimpleLightbox(".photo_link");
 
 const showError = (error) => {
   loader.classList.add('visually-hidden');
@@ -59,6 +63,8 @@ const showCards = (data) => {
   fetchedItemCount += data.length;
 
   gallery.insertAdjacentHTML('beforeend', markup);
+
+  lightbox.refresh();
 }
 
 const resetParams = ()  =>{
@@ -115,7 +121,7 @@ const handleScroll = async () => {
     return;
   }
 
-  if (itemsCount > fetchedItemCount) {
+  if (itemsCount < fetchedItemCount) {
     window.removeEventListener('scroll', handleScroll);
 
     gallery.insertAdjacentHTML(
@@ -126,19 +132,23 @@ const handleScroll = async () => {
     return;
   }
 
+  page++;
+
+  loader.classList.remove('visually-hidden');
+
   try {
     const response = await fetchImages(
       searchValue,
-      page++
+      page,
     );
 
+    showCards(response.data.hits);
+
+    loader.classList.add('visually-hidden');
   } catch (error) {
     showError(error);
   }
 
-  showCards(response.data.hits);
-
-  loader.classList.add('visually-hidden');
 };
 
 searchForm.addEventListener('submit', handleSubmit);
