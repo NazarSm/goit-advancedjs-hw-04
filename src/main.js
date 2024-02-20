@@ -15,11 +15,14 @@ let itemsCount = 0;
 let fetchedItemCount = 0;
 let page = 1;
 let searchValue = '';
+let isLoading = false;
 
 const lightbox = new SimpleLightbox(".photo_link");
 
 const showError = (error) => {
   loader.classList.add('visually-hidden');
+
+  isLoading = false;
 
   iziToast.error({ message: error.message });
 };
@@ -91,6 +94,8 @@ const handleSubmit = async (event) => {
 
   loader.classList.remove('visually-hidden');
 
+  isLoading = true;
+
   try {
     const response = await fetchImages(searchValue, page);
     const imageData = response.data;
@@ -107,6 +112,8 @@ const handleSubmit = async (event) => {
 
     loader.classList.add('visually-hidden');
 
+    isLoading = false;
+
     window.addEventListener('scroll', handleScroll);
   } catch (error) {
     showError(error);
@@ -117,7 +124,7 @@ const handleScroll = async () => {
   const isBottom = window.scrollY + window.innerHeight >=
     document.documentElement.scrollHeight;
 
-  if (!isBottom) {
+  if (!isBottom || isLoading) {
     return;
   }
 
@@ -136,6 +143,8 @@ const handleScroll = async () => {
 
   loader.classList.remove('visually-hidden');
 
+  isLoading = true;
+
   try {
     const response = await fetchImages(
       searchValue,
@@ -144,7 +153,15 @@ const handleScroll = async () => {
 
     showCards(response.data.hits);
 
+    isLoading = false;
+
     loader.classList.add('visually-hidden');
+
+    const { height: cardHeight } = gallery
+      .firstElementChild
+      .getBoundingClientRect();
+
+    window.scrollBy({ top: cardHeight * 2, behavior: "smooth" });
   } catch (error) {
     showError(error);
   }
