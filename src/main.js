@@ -17,6 +17,13 @@ let page = 1;
 let searchValue = '';
 let isLoading = false;
 
+iziToast.settings({
+  position: "topRight",
+  transitionIn: "flipInX",
+  transitionOut: "flipOutX",
+  maxWidth: "300px",
+});
+
 const lightbox = new SimpleLightbox(".photo_link");
 
 const showError = (error) => {
