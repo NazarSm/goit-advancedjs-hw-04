@@ -106,13 +106,16 @@ const handleSubmit = async (event) => {
       iziToast.error({
         message: 'Sorry, there are no images matching your search query. Please try again.',
       });
+    } else {
+      iziToast.success({
+        message: `Hooray! We found ${itemsCount} images.`,
+      });
     }
 
     showCards(imageData.hits);
 
-    loader.classList.add('visually-hidden');
-
     isLoading = false;
+    loader.classList.add('visually-hidden');
 
     window.addEventListener('scroll', handleScroll);
   } catch (error) {
@@ -128,7 +131,7 @@ const handleScroll = async () => {
     return;
   }
 
-  if (itemsCount < fetchedItemCount) {
+  if (itemsCount <= fetchedItemCount) {
     window.removeEventListener('scroll', handleScroll);
 
     gallery.insertAdjacentHTML(
@@ -154,14 +157,13 @@ const handleScroll = async () => {
     showCards(response.data.hits);
 
     isLoading = false;
-
     loader.classList.add('visually-hidden');
 
     const { height: cardHeight } = gallery
       .firstElementChild
       .getBoundingClientRect();
 
-    window.scrollBy({ top: cardHeight * 2, behavior: "smooth" });
+    window.scrollBy({ top: cardHeight * 1.5, behavior: "smooth" });
   } catch (error) {
     showError(error);
   }
